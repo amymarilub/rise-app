@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>RISE - Daily Habit Phoenix</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Karla:wght@300;400;500;600;700;800&family=Raleway:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Login XP Toast -->
+    <div id="login-toast" class="toast hidden">
+        <span class="toast-icon">🔥</span>
+        <span class="toast-text">+5 XP for showing up today!</span>
+    </div>
+
+    <!-- Level Up Modal -->
+    <div id="levelup-modal" class="modal hidden">
+        <div class="modal-content levelup">
+            <div class="levelup-phoenix" id="levelup-phoenix"></div>
+            <h2>LEVEL UP!</h2>
+            <p id="levelup-title"></p>
+            <p id="levelup-level"></p>
+            <button class="btn-primary" onclick="closeLevelUp()">Continue Rising</button>
+        </div>
+    </div>
+
+    <!-- Perfect Day Modal -->
+    <div id="perfect-modal" class="modal hidden">
+        <div class="modal-content perfect-day">
+            <div class="fire-burst" id="fire-burst"></div>
+            <h2>🔥 PERFECT DAY 🔥</h2>
+            <p>All 5 tasks completed!</p>
+            <p class="xp-bonus">+25 Bonus XP</p>
+            <button class="btn-primary" onclick="closePerfectDay()">Keep Rising</button>
+        </div>
+    </div>
+
+    <!-- Weekly Recap Modal -->
+    <div id="recap-modal" class="modal hidden">
+        <div class="modal-content recap">
+            <h2>Weekly Recap</h2>
+            <div id="recap-content"></div>
+            <button class="btn-primary" onclick="closeRecap()">Let's Go</button>
+        </div>
+    </div>
+
+    <!-- Achievement Unlocked Toast -->
+    <div id="achievement-toast" class="toast achievement-toast hidden">
+        <span class="toast-icon">🏆</span>
+        <span class="toast-text" id="achievement-toast-text"></span>
+    </div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-top">
+                <h1 class="logo">RISE</h1>
+                <div class="header-actions">
+                    <button class="text-btn" onclick="toggleTheme()" id="theme-btn">☀️</button>
+                </div>
+            </div>
+
+            <!-- Navigation Tabs -->
+            <nav class="nav-tabs">
+                <button class="nav-tab active" onclick="showSection('tasks')" data-section="tasks">Tasks</button>
+                <button class="nav-tab" onclick="showSection('stats')" data-section="stats">Stats</button>
+                <button class="nav-tab" onclick="showSection('achievements')" data-section="achievements">Achievements</button>
+                <button class="nav-tab" onclick="showSection('challenges')" data-section="challenges">Challenges</button>
+            </nav>
+
+            <!-- Phoenix Character Card -->
+            <div class="phoenix-card">
+                <div class="phoenix-avatar" id="phoenix-avatar">🪹</div>
+                <div class="phoenix-info">
+                    <div class="phoenix-title" id="phoenix-title">Ember</div>
+                    <div class="phoenix-level">Level <span id="phoenix-level">1</span></div>
+                    <div class="xp-bar-container">
+                        <div class="xp-bar" id="xp-bar" style="width: 0%"></div>
+                        <span class="xp-text" id="xp-text">0 / 100 XP</span>
+                    </div>
+                </div>
+                <div class="hp-section">
+                    <div class="hp-label">HP</div>
+                    <div class="hp-bar-container">
+                        <div class="hp-bar" id="hp-bar" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Daily Quote -->
+        <div class="quote-bar" id="quote-bar">
+            <span class="quote-icon">✦</span>
+            <span class="quote-text" id="quote-text"></span>
+        </div>
+
+        <!-- Streak Section -->
+        <section class="streak-section">
+            <div class="streak-main">
+                <div class="streak-flame" id="streak-flame">🔥</div>
+                <div class="streak-count" id="streak-count">0</div>
+                <div class="streak-label">day streak</div>
+            </div>
+            <div class="streak-details">
+                <div class="streak-detail">
+                    <span class="detail-value" id="best-streak">0</span>
+                    <span class="detail-label">best</span>
+                </div>
+                <div class="streak-detail">
+                    <span class="detail-value" id="streak-multiplier">1.0x</span>
+                    <span class="detail-label">multiplier</span>
+                </div>
+                <div class="streak-detail">
+                    <span class="detail-value" id="freeze-count">0</span>
+                    <span class="detail-label">freezes</span>
+                </div>
+            </div>
+            <!-- Stakes Display -->
+            <div class="stakes-bar hidden" id="stakes-bar">
+                <span class="stakes-icon">⚠️</span>
+                <span class="stakes-text" id="stakes-text"></span>
+            </div>
+            <!-- Nudge Display -->
+            <div class="nudge-bar hidden" id="nudge-bar">
+                <span class="nudge-icon">💡</span>
+                <span class="nudge-text" id="nudge-text"></span>
+            </div>
+        </section>
+
+        <!-- Main Content Sections -->
+        <main class="main-content">
+            <!-- Daily Tasks (default view) -->
+            <section class="section tasks-section" id="section-tasks">
+                <div class="section-header">
+                    <h2>The Five</h2>
+                    <span class="task-progress" id="task-progress">0/5</span>
+                </div>
+                <div class="tasks-list" id="tasks-list">
+                    <!-- Tasks rendered by JS -->
+                </div>
+            </section>
+
+            <!-- Stats Section -->
+            <section class="section stats-section hidden" id="section-stats">
+                <div class="section-header">
+                    <h2>Stats</h2>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-total-tasks">0</div>
+                        <div class="stat-label">Tasks Done</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-perfect-days">0</div>
+                        <div class="stat-label">Perfect Days</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-total-xp">0</div>
+                        <div class="stat-label">Total XP</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-total-days">0</div>
+                        <div class="stat-label">Days Active</div>
+                    </div>
+                </div>
+                <!-- Calendar Heat Map -->
+                <div class="heatmap-container">
+                    <h3>Activity</h3>
+                    <div class="heatmap-months" id="heatmap-months"></div>
+                    <div class="heatmap" id="heatmap"></div>
+                    <div class="heatmap-legend">
+                        <span>Less</span>
+                        <div class="legend-cell" style="background: #141f14"></div>
+                        <div class="legend-cell" style="background: #1a3a1a"></div>
+                        <div class="legend-cell" style="background: #2a5a2a"></div>
+                        <div class="legend-cell" style="background: #3a7a3a"></div>
+                        <div class="legend-cell" style="background: #4a9a4a"></div>
+                        <span>More</span>
+                    </div>
+                </div>
+                <!-- Weekly Trend -->
+                <div class="weekly-trend">
+                    <h3>This Week</h3>
+                    <div class="trend-bar-container" id="weekly-bars"></div>
+                </div>
+            </section>
+
+            <!-- Achievements Section -->
+            <section class="section achievements-section hidden" id="section-achievements">
+                <div class="section-header">
+                    <h2>Achievements</h2>
+                </div>
+                <div class="bookmarks-shelf" id="bookmarks-shelf">
+                    <!-- Rendered by JS -->
+                </div>
+            </section>
+
+            <!-- Quarterly Challenges Section -->
+            <section class="section challenges-section hidden" id="section-challenges">
+                <div class="section-header">
+                    <h2 id="quarter-title">Q2 — Rising Heat</h2>
+                </div>
+                <div class="challenges-list" id="challenges-list">
+                    <!-- Rendered by JS -->
+                </div>
+                <div class="seasonal-badges">
+                    <h3>Seasonal Phoenix Badges</h3>
+                    <div class="seasonal-grid" id="seasonal-grid">
+                        <!-- Rendered by JS -->
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Particle canvas for celebrations -->
+    <canvas id="particles" class="particles-canvas"></canvas>
+
+    <script src="app.js"></script>
+</body>
+</html>
